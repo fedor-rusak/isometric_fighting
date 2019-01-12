@@ -12,3 +12,12 @@ Run this inside cloned project:
 ```
 cargo run
 ```
+
+## History
+
+### 0.1.1
+ - Image loading, drawing,
+ - FPS cap
+
+### 0.1.0
+ - initial code with event loop setup
