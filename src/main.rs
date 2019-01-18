@@ -5,6 +5,7 @@ use std::env;
 use std::path;
 use std::time::Duration;
 
+use ggez::event::{self, Axis, Button, KeyCode, KeyMods, MouseButton};
 use ggez::*;
 
 struct GameState {
@@ -44,7 +45,7 @@ impl ggez::event::EventHandler for GameState {
     }
 
     fn draw(&mut self, ctx: &mut Context) -> GameResult {
-        println!("Draw event! time_passed_from_last_frame = {}ns", self.time_passed_from_last_frame.subsec_nanos());
+        // println!("Draw event! time_passed_from_last_frame = {}ns", self.time_passed_from_last_frame.subsec_nanos());
 
         graphics::clear(ctx, [0.1, 0.2, 0.3, 1.0].into());
 
@@ -54,8 +55,18 @@ impl ggez::event::EventHandler for GameState {
         graphics::present(ctx)?;
         Ok(())
     }
-}
 
+    fn key_down_event(&mut self, ctx: &mut Context, keycode: KeyCode, _keymod: KeyMods, _repeat: bool) {
+        match keycode {
+            KeyCode::Escape => quit(ctx),
+            _ => (), // Do nothing
+        }
+    }
+
+    fn controller_button_down_event(&mut self, _ctx: &mut Context, btn: Button, id: usize) {
+        println!("Controller button pressed: {:?} Controller_Id: {}", btn, id);
+    }
+}
 
 
 fn main() {
