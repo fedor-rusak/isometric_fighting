@@ -28,13 +28,15 @@ struct GameState {
     fps: u32,
     input: InputState,
     time_passed_from_last_frame: Duration,
+    floor: graphics::Image,
     avatar: graphics::Image
 }
 
 impl GameState {
 
     fn new(ctx: &mut Context, fps: u32) -> GameResult<GameState> {
-        let image1 = graphics::Image::new(ctx, "/dragon1.png")?;
+        let floorTile = graphics::Image::new(ctx, "/tile.png")?;
+        let avatarFace = graphics::Image::new(ctx, "/avatar.png")?;
 
         let state = GameState {
             pos_x: 20.0,
@@ -42,7 +44,8 @@ impl GameState {
             fps: fps,
             input: InputState::default(),
             time_passed_from_last_frame: Duration::new(0, 0),
-            avatar: image1
+            floor: floorTile,
+            avatar: avatarFace
         };
 
         Ok(state)
@@ -72,6 +75,15 @@ impl ggez::event::EventHandler for GameState {
 
         graphics::clear(ctx, [0.1, 0.2, 0.3, 1.0].into());
 
+        //floor
+        for i in 0..8 {
+            for j in 0..10 {
+                let dst = cgmath::Point2::new(100.0*i as f32, 60.0*j as f32);
+                graphics::draw(ctx, &self.floor, (dst,))?;
+            }
+        }
+
+        //avatar
         let dst = cgmath::Point2::new(self.pos_x, self.pos_y);
         graphics::draw(ctx, &self.avatar, (dst,))?;
 

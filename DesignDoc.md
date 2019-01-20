@@ -18,8 +18,21 @@ Dodge and block as useful actions to defend yourself. Projectiles, explosives, t
 
 Actually things that I don't want to see are some corridors or narrow labyrinths. Yet this is ok as long as it is fun.
 
-# First thing to try
+# Random technical thoughts
 
-Do some perspective rendering and image movement.
+So by default alpha blending is on and this really simplifies things for starter!
 
-Do some keyboard keys work to allow smooth yet limited movement with end lag for moves.
+Keyboard works a bit clunky due to check for sticky presses (I guess???). But it is for testing and NOT for final results.
+
+
+# Things to try
+
+Do some perspective rendering and image movement. Done!
+
+Do some keyboard keys work to allow smooth yet limited movement with end lag for moves. Done!
+
+Need some speed calculations to move according to floor tiles. Currently tile size is 100x60. Is it optimal?
+
+Some nice pictures would be really sweet. But not urgent.
+
+Not sure abour resizing and rescaling things out here. By default window is 800x600 and this seems to be too small nowadays. I mean like how to draw on bigger screens and keeps rations and feel secure about using non-standard (4:3) resolutions. something like Zoom? Something like camera to operate with?

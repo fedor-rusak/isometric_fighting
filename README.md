@@ -15,6 +15,11 @@ cargo run
 
 ## History
 
+### 0.1.4
+ - Floor is drawn!
+ - Fresh avatar pic!
+ - DesignDoc update
+
 ### 0.1.3
  - Temporary ggez dependency via git. Fixed version not published yet.
  - Moving picture via keyboard!
