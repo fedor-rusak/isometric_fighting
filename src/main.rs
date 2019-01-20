@@ -10,14 +10,16 @@ use ggez::*;
 
 struct InputState {
     xaxis: f32,
-    yaxis: f32
+    yaxis: f32,
+    speed: f32
 }
 
 impl Default for InputState {
     fn default() -> Self {
         InputState {
             xaxis: 0.0,
-            yaxis: 0.0
+            yaxis: 0.0,
+            speed: 2.0
         }
     }
 }
@@ -58,8 +60,8 @@ impl ggez::event::EventHandler for GameState {
     fn update(&mut self, ctx: &mut Context) -> GameResult {
         let mut timeframe = Duration::new(0, 0);
 
-        self.pos_x += self.input.xaxis;
-        self.pos_y += self.input.yaxis;
+        self.pos_x += self.input.xaxis * (1.0/0.6) * self.input.speed;
+        self.pos_y += self.input.yaxis * self.input.speed;
 
         while timer::check_update_time(ctx, self.fps) {
             timeframe = timeframe + timer::delta(ctx);

@@ -15,6 +15,10 @@ cargo run
 
 ## History
 
+### 0.1.5
+ - Speed for avatar!
+ - Now avatar moves across the lines!
+
 ### 0.1.4
  - Floor is drawn!
  - Fresh avatar pic!
