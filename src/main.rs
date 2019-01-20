@@ -5,11 +5,28 @@ use std::env;
 use std::path;
 use std::time::Duration;
 
-use ggez::event::{self, Axis, Button, KeyCode, KeyMods, MouseButton};
+use ggez::event::{self, Button, KeyCode, KeyMods};
 use ggez::*;
 
+struct InputState {
+    xaxis: f32,
+    yaxis: f32
+}
+
+impl Default for InputState {
+    fn default() -> Self {
+        InputState {
+            xaxis: 0.0,
+            yaxis: 0.0
+        }
+    }
+}
+
 struct GameState {
+    pos_x: f32,
+    pos_y: f32,
     fps: u32,
+    input: InputState,
     time_passed_from_last_frame: Duration,
     avatar: graphics::Image
 }
@@ -20,7 +37,10 @@ impl GameState {
         let image1 = graphics::Image::new(ctx, "/dragon1.png")?;
 
         let state = GameState {
+            pos_x: 20.0,
+            pos_y: 20.0,
             fps: fps,
+            input: InputState::default(),
             time_passed_from_last_frame: Duration::new(0, 0),
             avatar: image1
         };
@@ -34,6 +54,9 @@ impl ggez::event::EventHandler for GameState {
 
     fn update(&mut self, ctx: &mut Context) -> GameResult {
         let mut timeframe = Duration::new(0, 0);
+
+        self.pos_x += self.input.xaxis;
+        self.pos_y += self.input.yaxis;
 
         while timer::check_update_time(ctx, self.fps) {
             timeframe = timeframe + timer::delta(ctx);
@@ -49,7 +72,7 @@ impl ggez::event::EventHandler for GameState {
 
         graphics::clear(ctx, [0.1, 0.2, 0.3, 1.0].into());
 
-        let dst = cgmath::Point2::new(20.0, 20.0);
+        let dst = cgmath::Point2::new(self.pos_x, self.pos_y);
         graphics::draw(ctx, &self.avatar, (dst,))?;
 
         graphics::present(ctx)?;
@@ -58,7 +81,31 @@ impl ggez::event::EventHandler for GameState {
 
     fn key_down_event(&mut self, ctx: &mut Context, keycode: KeyCode, _keymod: KeyMods, _repeat: bool) {
         match keycode {
+            KeyCode::Up => {
+                self.input.yaxis = -1.0;
+            },
+            KeyCode::Down => {
+                self.input.yaxis = 1.0;
+            },
+            KeyCode::Left => {
+                self.input.xaxis = -1.0;
+            }
+            KeyCode::Right => {
+                self.input.xaxis = 1.0;
+            }
             KeyCode::Escape => quit(ctx),
+            _ => (), // Do nothing
+        }
+    }
+
+    fn key_up_event(&mut self, _ctx: &mut Context, keycode: KeyCode, _keymod: KeyMods) {
+        match keycode {
+            KeyCode::Up | KeyCode::Down => {
+                self.input.yaxis = 0.0;
+            }
+            KeyCode::Left | KeyCode::Right => {
+                self.input.xaxis = 0.0;
+            }
             _ => (), // Do nothing
         }
     }

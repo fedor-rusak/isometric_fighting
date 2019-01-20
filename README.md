@@ -15,6 +15,10 @@ cargo run
 
 ## History
 
+### 0.1.3
+ - Temporary ggez dependency via git. Fixed version not published yet.
+ - Moving picture via keyboard!
+
 ### 0.1.2
  - Esc to exit!
  - Checked controllers buttons and they worked!
