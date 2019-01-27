@@ -31,14 +31,16 @@ struct GameState {
     input: InputState,
     time_passed_from_last_frame: Duration,
     floor: graphics::Image,
-    avatar: graphics::Image
+    avatar: graphics::Image,
+    avatar_other_angle: graphics::Image
 }
 
 impl GameState {
 
     fn new(ctx: &mut Context, fps: u32) -> GameResult<GameState> {
-        let floorTile = graphics::Image::new(ctx, "/tile.png")?;
-        let avatarFace = graphics::Image::new(ctx, "/avatar.png")?;
+        let floor_tile = graphics::Image::new(ctx, "/tile.png")?;
+        let avatar_face = graphics::Image::new(ctx, "/avatar.png")?;
+        let avatar_face_other_angle = graphics::Image::new(ctx, "/avatar_other_angle.png")?;
 
         let state = GameState {
             pos_x: 20.0,
@@ -46,8 +48,9 @@ impl GameState {
             fps: fps,
             input: InputState::default(),
             time_passed_from_last_frame: Duration::new(0, 0),
-            floor: floorTile,
-            avatar: avatarFace
+            floor: floor_tile,
+            avatar: avatar_face,
+            avatar_other_angle: avatar_face_other_angle
         };
 
         Ok(state)
@@ -87,7 +90,13 @@ impl ggez::event::EventHandler for GameState {
 
         //avatar
         let dst = cgmath::Point2::new(self.pos_x, self.pos_y);
-        graphics::draw(ctx, &self.avatar, (dst,))?;
+
+        let mut to_draw = &self.avatar_other_angle;
+
+        if (self.input.xaxis.abs() + self.input.yaxis.abs()) == 2.0 {
+            to_draw = &self.avatar;
+        }
+        graphics::draw(ctx, to_draw, (dst,))?;
 
         graphics::present(ctx)?;
         Ok(())
@@ -152,7 +161,7 @@ fn main() {
     const DESIRED_FPS: u32 = 60;
     let state = &mut GameState::new(ctx, DESIRED_FPS).unwrap();
 
-    event::run(ctx, event_loop, state);
+    let _result = event::run(ctx, event_loop, state);
 
     println!("Demo finished successfully!");
 }

@@ -15,6 +15,10 @@ cargo run
 
 ## History
 
+### 0.1.6
+ - Different images for different angles!
+ - small snake_case fix
+
 ### 0.1.5
  - Speed for avatar!
  - Now avatar moves across the lines!
