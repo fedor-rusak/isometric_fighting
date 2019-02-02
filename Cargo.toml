@@ -1,6 +1,6 @@
 [package]
 name = "isometric_fighting"
-version = "0.1.8"
+version = "0.1.9"
 authors = ["Fedor Rusak <node@fedor-rusak.ru>"]
 edition = "2018"
 

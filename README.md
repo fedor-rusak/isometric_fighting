@@ -15,6 +15,9 @@ cargo run
 
 ## History
 
+### 0.1.9
+ - Background audio part!
+
 ### 0.1.8
  - Hit space to get back to center!
 

@@ -34,6 +34,7 @@ struct GameState {
     avatar: graphics::Image,
     avatar_other_angle: graphics::Image,
     sound: audio::Source,
+    background_audio: audio::Source
 }
 
 impl GameState {
@@ -43,6 +44,8 @@ impl GameState {
         let avatar_face = graphics::Image::new(ctx, "/avatar.png")?;
         let avatar_face_other_angle = graphics::Image::new(ctx, "/avatar_other_angle.png")?;
         let grass_step = audio::Source::new(ctx, "/grass_foot_step.ogg")?;
+        let mut river_and_birds = audio::Source::new(ctx, "/river_and_birds.ogg")?;
+        river_and_birds.set_repeat(true);
 
         let state = GameState {
             pos_x: 20.0,
@@ -53,7 +56,8 @@ impl GameState {
             floor: floor_tile,
             avatar: avatar_face,
             avatar_other_angle: avatar_face_other_angle,
-            sound : grass_step
+            sound : grass_step,
+            background_audio: river_and_birds
         };
 
         Ok(state)
@@ -77,8 +81,12 @@ impl ggez::event::EventHandler for GameState {
 
         if (self.input.xaxis != 0.0 || self.input.yaxis != 0.0) && self.sound.playing() == false {
             let _result = self.sound.play();
+            self.sound.set_volume(0.5);
         }
 
+        if self.background_audio.playing() == false {
+            let _result = self.background_audio.play();
+        }
         Ok(())
     }
 
