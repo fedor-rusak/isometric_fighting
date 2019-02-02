@@ -32,7 +32,8 @@ struct GameState {
     time_passed_from_last_frame: Duration,
     floor: graphics::Image,
     avatar: graphics::Image,
-    avatar_other_angle: graphics::Image
+    avatar_other_angle: graphics::Image,
+    sound: audio::Source,
 }
 
 impl GameState {
@@ -41,6 +42,7 @@ impl GameState {
         let floor_tile = graphics::Image::new(ctx, "/tile.png")?;
         let avatar_face = graphics::Image::new(ctx, "/avatar.png")?;
         let avatar_face_other_angle = graphics::Image::new(ctx, "/avatar_other_angle.png")?;
+        let grass_step = audio::Source::new(ctx, "/grass_foot_step.ogg")?;
 
         let state = GameState {
             pos_x: 20.0,
@@ -50,7 +52,8 @@ impl GameState {
             time_passed_from_last_frame: Duration::new(0, 0),
             floor: floor_tile,
             avatar: avatar_face,
-            avatar_other_angle: avatar_face_other_angle
+            avatar_other_angle: avatar_face_other_angle,
+            sound : grass_step
         };
 
         Ok(state)
@@ -71,6 +74,10 @@ impl ggez::event::EventHandler for GameState {
         }
  
         self.time_passed_from_last_frame = timeframe;
+
+        if (self.input.xaxis != 0.0 || self.input.yaxis != 0.0) && self.sound.playing() == false {
+            let _result = self.sound.play();
+        }
 
         Ok(())
     }

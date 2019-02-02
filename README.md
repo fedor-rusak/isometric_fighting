@@ -15,6 +15,9 @@ cargo run
 
 ## History
 
+### 0.1.7
+ - Sound added!
+
 ### 0.1.6
  - Different images for different angles!
  - small snake_case fix

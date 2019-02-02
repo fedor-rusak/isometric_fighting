@@ -41,3 +41,7 @@ Some nice pictures would be really sweet. But not urgent. UPDATE! So Got some st
 Not sure abour resizing and rescaling things out here. By default window is 800x600 and this seems to be too small nowadays. I mean like how to draw on bigger screens and keeps rations and feel secure about using non-standard (4:3) resolutions. something like Zoom? Something like camera to operate with?
 
 Some UI? Like health or map part or something? Not exactly action-rpg like but at least location name and fps counter would be sweet!
+
+Sound! It was quite easy to add just one sound for moving avatar! But what about something like background music?
+
+And what about pausing a game?
