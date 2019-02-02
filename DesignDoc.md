@@ -45,3 +45,5 @@ Some UI? Like health or map part or something? Not exactly action-rpg like but a
 Sound! It was quite easy to add just one sound for moving avatar! But what about something like background music?
 
 And what about pausing a game?
+
+My daughter keeps moving box away from screen so I had to add space handling to get it back to center! Done!

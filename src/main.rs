@@ -136,6 +136,10 @@ impl ggez::event::EventHandler for GameState {
             KeyCode::Left | KeyCode::Right => {
                 self.input.xaxis = 0.0;
             }
+            KeyCode::Space => {
+                self.pos_x = 400.0 - 50.0; //because image are drawn from left top corner and not from center
+                self.pos_y = 300.0 - 50.0; // and current avatar image is 100x100
+            }
             _ => (), // Do nothing
         }
     }
