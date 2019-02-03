@@ -49,3 +49,15 @@ And what about pausing a game?
 My daughter keeps moving box away from screen so I had to add space handling to get it back to center! Done!
 
 Performance even with something like 400 renders of one sprite sucks royally. Yet this is solved by a bit longer compilation with optimisations. Done!
+
+So last addition was rather huge so let me explain the idea. I wanted to move cube around and make tile under it change color. Sounds easy right? Well not so fast. First we made a new tile and I got to the point where my simple rendering just was not enough as it was drawing piece in checkers board style. To fix this I had to change many things, but it can be summarized as beginning of projection camera approach. What is camera? Glad you asked.
+
+There is some 3d world, but when rendering a 2d image of it (to show it on screen you know?) we have to transform 3d coords to some 2d coords. This is called projection. And this projection must be done for some theoretical viewer that is almost like camera man. Henth camera approach. In current state camera shows the center part of grid 20x20 which is playground for cube avatar.
+
+Technical details are like this. I have to introduced normal 3d coords (z is always 0 now), and movement have to be described as moving in this 3d coords and not some screen coords dependant on screen size. This is somewhat difficult to describe easier yet this is really improtant to show many objects and introduce things like physics and collision and predictable movement.
+
+Movement had to be redone as previously it was working with axis, and now this is converted to inputs which are later converted to specific combinations of axis values and special modifier for diagonal movement. Because moving left and right at the sametime should have same length as left OR right. So 1 step for straight movement is like sin45 for two axis which is like 0.85. Sounds clunky but believe me it should be like that.
+
+So now if I would want to do something like zooming it would mean changes in some places but it would be in update and render and not in input handling part.
+
+One more thing, as previously I was working with screen pixels, and had to move in 3d worls, I had to give some dimensions to tiles that I had. I decided that it should be like 30 pixeled square. And this is part of movement calculation now. So technically I can change speed or this edge_length to control the movement around the field.

@@ -15,6 +15,11 @@ cargo run
 
 ## History
 
+### 0.1.10
+ - 3d coords (with z=0) for describing avatar movement!
+ - rendering each tile separately
+ - funny mode where moving over tile changes its color and space resets all!
+
 ### 0.1.9
  - Background audio part!
 
