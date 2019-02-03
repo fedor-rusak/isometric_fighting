@@ -36,7 +36,7 @@ Do some keyboard keys work to allow smooth yet limited movement with end lag for
 
 Need some speed calculations to move according to floor tiles. Currently tile size is 100x60. Is it optimal? UPDATE: who knows? But moving across the lines is niiice.
 
-Some nice pictures would be really sweet. But not urgent. UPDATE! So Got some stupid result. yet I got the feeling I need some modeling software with orthogonal rendering. Because I need parallel lines to be parallel and perspective means that these lines would cross... Still some progress :) UPDATE! So now it is more like abstract figures but why not?! Update! Now with actually different images for 2 different angles :D. My head nearly fell off while I tried to reinvent the idea behind this. Like ellipses and rotation and crossing points waaah!
+Some nice pictures would be really sweet. But not urgent. UPDATE! So Got some stupid result. yet I got the feeling I need some modeling software with orthogonal rendering. Because I need parallel lines to be parallel and perspective means that these lines would cross... Still some progress :) UPDATE! So now it is more like abstract figures but why not?! Update! Now with actually different images for 2 different angles :D. My head nearly fell off while I tried to reinvent the idea behind this. Like ellipses and rotation and crossing points waaah! Now avatar cube has no transparent sides!
 
 Not sure abour resizing and rescaling things out here. By default window is 800x600 and this seems to be too small nowadays. I mean like how to draw on bigger screens and keeps rations and feel secure about using non-standard (4:3) resolutions. something like Zoom? Something like camera to operate with?
 

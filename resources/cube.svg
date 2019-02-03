@@ -15,7 +15,7 @@
    version="1.1"
    id="svg8"
    sodipodi:docname="cube.svg"
-   inkscape:export-filename="C:\Users\Федор\Desktop\avatar.png"
+   inkscape:export-filename="C:\frusak\Projects\Rust\isometric_fighting\resources\avatar.png"
    inkscape:export-xdpi="96"
    inkscape:export-ydpi="96"
    inkscape:version="0.92.4 (5da689c313, 2019-01-14)">
@@ -29,7 +29,7 @@
      inkscape:pageopacity="0.0"
      inkscape:pageshadow="2"
      inkscape:zoom="11.2"
-     inkscape:cx="32.196779"
+     inkscape:cx="12.06285"
      inkscape:cy="57.177978"
      inkscape:document-units="mm"
      inkscape:current-layer="layer1"
@@ -101,6 +101,18 @@
        style="fill:#c87137;stroke-width:0.08928572"
        d="M 38.260837,32.326978 C 31.807301,28.45502 26.431572,25.215883 26.314771,25.128895 l -0.212365,-0.158159 11.945498,-7.16815 11.945499,-7.16815 11.948031,7.168369 c 9.110326,5.465853 11.921968,7.192338 11.838295,7.26929 -0.06035,0.05551 -5.436713,3.294546 -11.947464,7.197864 l -11.837729,7.096942 z"
        id="path123"
+       inkscape:connector-curvature="0"
+       transform="matrix(0.26458333,0,0,0.26458333,0,270.54168)" />
+    <path
+       style="fill:#ff00cc;stroke-width:0.08928572"
+       d="M 37.400725,56.818444 25.5511,49.705951 25.548047,37.845832 c -0.0017,-6.738538 0.03067,-11.847267 0.07504,-11.830358 0.04295,0.01637 5.427029,3.239974 11.964613,7.163567 l 11.886516,7.133804 -0.02265,11.787329 c -0.01492,7.765402 -0.05311,11.794738 -0.111934,11.809046 -0.04911,0.01195 -5.421617,-3.178904 -11.938911,-7.090776 z"
+       id="path24"
+       inkscape:connector-curvature="0"
+       transform="matrix(0.26458333,0,0,0.26458333,0,270.54168)" />
+    <path
+       style="fill:#ff00cc;stroke-width:0.08928572"
+       d="M 50.544993,52.179441 V 40.312452 l 11.88619,-7.133608 c 6.537403,-3.923484 11.921332,-7.147001 11.964285,-7.16337 0.04437,-0.01691 0.0768,5.091845 0.0751,11.830358 l -0.003,11.860119 -11.617754,6.964285 c -6.389765,3.830357 -11.772343,7.056965 -11.961286,7.17024 l -0.343533,0.205953 z"
+       id="path26"
        inkscape:connector-curvature="0"
        transform="matrix(0.26458333,0,0,0.26458333,0,270.54168)" />
   </g>
