@@ -11,3 +11,6 @@ cgmath = { version = "0.16", features = ["mint"]}
 [dependencies.ggez]
 git="https://github.com/ggez/ggez"
 rev = "60cfa61dcf6a45ba381a39874fb13e37ad6e3bd6"
+
+[profile.dev]
+opt-level=2
