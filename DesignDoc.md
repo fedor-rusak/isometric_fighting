@@ -28,6 +28,16 @@ Should I think about dynamic lighting? It requires some deep thoughts to make th
 
 But some form of shadows is a must. as it would create desired illusion of volume and depth!
 
+It is really beautiful thing to have clippy and rustfmt as simple tools out of the box. One can suggest more idiomatic ways to write code and use less mut variables which is great. Another one forces specific styleguide which is really useful as I would forget about this at some moment.
+
+& stands for borrowing yet not destroying parameter after method execution. Nice!
+
+Methods as separate impl block sounds nice buuuut I would like to go for simple function when I can.
+
+Gots some wishes about destructuring but that is a super minor issue.
+
+Keeping code at least somewhat readable is hard, yet it give opportunity to add features easily. And rust feels like a nice tool to refactor existing code even if you forgot some details about its logic.
+
 # Things to try
 
 Do some perspective rendering and image movement. Done!
@@ -61,3 +71,7 @@ Movement had to be redone as previously it was working with axis, and now this i
 So now if I would want to do something like zooming it would mean changes in some places but it would be in update and render and not in input handling part.
 
 One more thing, as previously I was working with screen pixels, and had to move in 3d worls, I had to give some dimensions to tiles that I had. I decided that it should be like 30 pixeled square. And this is part of movement calculation now. So technically I can change speed or this edge_length to control the movement around the field.
+
+Got some progress here. When introducing camera concept you should be aware how it actually changes rendering part. As you want sort of transformm pixel coordinates according to camera "part" you are supposed to see on screen. And if you make it right then you can have this beautiful illusion when some camera moves around with your character if it was sort of glued to it. It also provides easier navigation as your main character is in the center all the time.
+
+My attempts to make avatar keep direction after all buttons were released almost failed. As it is really hard to release 2 buttons at the same millisecond. But I guess this part will be reworked in future when some delaying and combinations will become necessary.

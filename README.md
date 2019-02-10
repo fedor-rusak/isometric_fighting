@@ -15,6 +15,10 @@ cargo run
 
 ## History
 
+### 0.1.11
+ - Camera as established mechanism!
+ - Camera moves with avatar!
+
 ### 0.1.10
  - 3d coords (with z=0) for describing avatar movement!
  - rendering each tile separately
