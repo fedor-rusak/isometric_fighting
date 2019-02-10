@@ -61,7 +61,7 @@ impl GameState {
         let state = GameState {
             pos_x: 390.0,
             pos_y: 300.0,
-            fps: fps,
+            fps,
             input: InputState::default(),
             time_passed_from_last_frame: Duration::new(0, 0),
             zero_x: 400.0,
@@ -86,11 +86,12 @@ impl ggez::event::EventHandler for GameState {
     fn update(&mut self, ctx: &mut Context) -> GameResult {
         let mut timeframe = Duration::new(0, 0);
 
-        let mut modifier = 1.0;
-
-        if (self.input.up || self.input.down) && (self.input.left || self.input.right) {
-            modifier = 0.85; //diagonal movement for 1.0 means sin45*1.0
+        let modifier = if (self.input.up || self.input.down) && (self.input.left || self.input.right) {
+            0.85 //diagonal movement for 1.0 means sin45*1.0
         }
+        else {
+            1.0
+        };
 
         let mut xaxis = 0.0;
         let mut yaxis = 0.0;
@@ -114,19 +115,19 @@ impl ggez::event::EventHandler for GameState {
 
 
         while timer::check_update_time(ctx, self.fps) {
-            timeframe = timeframe + timer::delta(ctx);
+            timeframe += timer::delta(ctx);
         }
 
 
         self.time_passed_from_last_frame = timeframe;
 
 
-        if (xaxis != 0.0 || yaxis != 0.0) && self.sound.playing() == false {
+        if (xaxis != 0.0 || yaxis != 0.0) && !self.sound.playing() {
             let _result = self.sound.play();
             self.sound.set_volume(0.5);
         }
 
-        if self.background_audio.playing() == false {
+        if !self.background_audio.playing() {
             let _result = self.background_audio.play();
         }
 
@@ -136,9 +137,7 @@ impl ggez::event::EventHandler for GameState {
 
         let key = format!("{}_{}", tile_i, tile_j);
 
-        if  !self.visited_tiles_map.contains_key(&key) {
-            self.visited_tiles_map.insert(key, true);
-        }
+        self.visited_tiles_map.entry(key).or_insert(true);
 
         Ok(())
     }
@@ -162,10 +161,12 @@ impl ggez::event::EventHandler for GameState {
 
                 let key = format!("{}_{}",i,j);
 
-                let mut image = &self.floor;
-                if self.visited_tiles_map.contains_key(&key) {
-                    image = &self.floor_colored;
+                let image = if self.visited_tiles_map.contains_key(&key) {
+                    &self.floor_colored
                 }
+                else {
+                    &self.floor
+                };
 
                 graphics::draw(ctx, image, (dst,))?;
             }
@@ -180,11 +181,13 @@ impl ggez::event::EventHandler for GameState {
             //and current avatar image is 100x100
             let dst = cgmath::Point2::new(avatar_x-50.0, avatar_y-50.0);
 
-            let mut to_draw = &self.avatar_other_angle;
-
-            if (self.input.up || self.input.down) && (self.input.left || self.input.right) {
-                to_draw = &self.avatar;
+            let to_draw = if (self.input.up || self.input.down) && (self.input.left || self.input.right) {
+                &self.avatar
             }
+            else {
+                &self.avatar_other_angle
+            };
+
             graphics::draw(ctx, to_draw, (dst,))?;
         }
 
