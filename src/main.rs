@@ -1,10 +1,10 @@
 extern crate cgmath;
 extern crate ggez;
 
+use std::collections::HashMap;
 use std::env;
 use std::path;
 use std::time::Duration;
-use std::collections::HashMap;
 
 use ggez::event::{self, Button, KeyCode, KeyMods};
 use ggez::*;
@@ -14,7 +14,7 @@ struct InputState {
     down: bool,
     left: bool,
     right: bool,
-    speed: f32
+    speed: f32,
 }
 
 impl Default for InputState {
@@ -24,7 +24,7 @@ impl Default for InputState {
             down: false,
             left: false,
             right: false,
-            speed: 1.5
+            speed: 1.5,
         }
     }
 }
@@ -44,11 +44,10 @@ struct GameState {
     avatar: graphics::Image,
     avatar_other_angle: graphics::Image,
     sound: audio::Source,
-    background_audio: audio::Source
+    background_audio: audio::Source,
 }
 
 impl GameState {
-
     fn new(ctx: &mut Context, fps: u32) -> GameResult<GameState> {
         let floor_tile = graphics::Image::new(ctx, "/tile.png")?;
         let floor_tile_colored = graphics::Image::new(ctx, "/tile_colored.png")?;
@@ -72,55 +71,48 @@ impl GameState {
             floor_colored: floor_tile_colored,
             avatar: avatar_face,
             avatar_other_angle: avatar_face_other_angle,
-            sound : grass_step,
-            background_audio: river_and_birds
+            sound: grass_step,
+            background_audio: river_and_birds,
         };
 
         Ok(state)
     }
-  
 }
 
 impl ggez::event::EventHandler for GameState {
-
     fn update(&mut self, ctx: &mut Context) -> GameResult {
         let mut timeframe = Duration::new(0, 0);
 
-        let modifier = if (self.input.up || self.input.down) && (self.input.left || self.input.right) {
-            0.85 //diagonal movement for 1.0 means sin45*1.0
-        }
-        else {
-            1.0
-        };
+        let modifier =
+            if (self.input.up || self.input.down) && (self.input.left || self.input.right) {
+                0.85 //diagonal movement for 1.0 means sin45*1.0
+            } else {
+                1.0
+            };
 
         let mut xaxis = 0.0;
         let mut yaxis = 0.0;
 
         if (self.input.left && !self.input.down) || (self.input.up && !self.input.right) {
             xaxis = -1.0;
-        }
-        else if (!self.input.left && self.input.down) || (!self.input.up && self.input.right) {
+        } else if (!self.input.left && self.input.down) || (!self.input.up && self.input.right) {
             xaxis = 1.0;
         }
 
         if (self.input.left && !self.input.up) || (self.input.down && !self.input.right) {
             yaxis = 1.0;
-        }
-        else if (!self.input.left && self.input.up) || (!self.input.down && self.input.right) {
+        } else if (!self.input.left && self.input.up) || (!self.input.down && self.input.right) {
             yaxis = -1.0;
         }
 
         self.pos_x += xaxis * self.input.speed * modifier;
         self.pos_y += yaxis * self.input.speed * modifier;
 
-
         while timer::check_update_time(ctx, self.fps) {
             timeframe += timer::delta(ctx);
         }
 
-
         self.time_passed_from_last_frame = timeframe;
-
 
         if (xaxis != 0.0 || yaxis != 0.0) && !self.sound.playing() {
             let _result = self.sound.play();
@@ -153,18 +145,17 @@ impl ggez::event::EventHandler for GameState {
         //floor
         for i in 0..20 {
             for j in 0..20 {
-                let x = self.zero_x + TILE_WIDTH_HALF * (i-j) as f32;
-                let y = self.zero_y + TILE_HEIGHT_HALF * (i+j) as f32;
-                
+                let x = self.zero_x + TILE_WIDTH_HALF * (i - j) as f32;
+                let y = self.zero_y + TILE_HEIGHT_HALF * (i + j) as f32;
+
                 //because our tile is 100x60 and we have 'center coords' for it in x and y
                 let dst = cgmath::Point2::new(x - TILE_WIDTH_HALF, y - TILE_HEIGHT_HALF);
 
-                let key = format!("{}_{}",i,j);
+                let key = format!("{}_{}", i, j);
 
                 let image = if self.visited_tiles_map.contains_key(&key) {
                     &self.floor_colored
-                }
-                else {
+                } else {
                     &self.floor
                 };
 
@@ -172,21 +163,22 @@ impl ggez::event::EventHandler for GameState {
             }
         }
 
-
         {
-            let avatar_x = self.zero_x + (self.pos_x - self.pos_y) * TILE_WIDTH_HALF / self.edge_length;
-            let avatar_y = self.zero_y + (self.pos_x + self.pos_y) * TILE_HEIGHT_HALF / self.edge_length;
+            let avatar_x =
+                self.zero_x + (self.pos_x - self.pos_y) * TILE_WIDTH_HALF / self.edge_length;
+            let avatar_y =
+                self.zero_y + (self.pos_x + self.pos_y) * TILE_HEIGHT_HALF / self.edge_length;
 
             //because images are drawn from left top corner and not from center
             //and current avatar image is 100x100
-            let dst = cgmath::Point2::new(avatar_x-50.0, avatar_y-50.0);
+            let dst = cgmath::Point2::new(avatar_x - 50.0, avatar_y - 50.0);
 
-            let to_draw = if (self.input.up || self.input.down) && (self.input.left || self.input.right) {
-                &self.avatar
-            }
-            else {
-                &self.avatar_other_angle
-            };
+            let to_draw =
+                if (self.input.up || self.input.down) && (self.input.left || self.input.right) {
+                    &self.avatar
+                } else {
+                    &self.avatar_other_angle
+                };
 
             graphics::draw(ctx, to_draw, (dst,))?;
         }
@@ -195,16 +187,22 @@ impl ggez::event::EventHandler for GameState {
         Ok(())
     }
 
-    fn key_down_event(&mut self, ctx: &mut Context, keycode: KeyCode, _keymod: KeyMods, _repeat: bool) {
+    fn key_down_event(
+        &mut self,
+        ctx: &mut Context,
+        keycode: KeyCode,
+        _keymod: KeyMods,
+        _repeat: bool,
+    ) {
         match keycode {
             KeyCode::Up => {
                 self.input.up = true;
                 self.input.down = false;
-            },
+            }
             KeyCode::Down => {
                 self.input.down = true;
                 self.input.up = false;
-            },
+            }
             KeyCode::Left => {
                 self.input.left = true;
                 self.input.right = false;
@@ -246,7 +244,6 @@ impl ggez::event::EventHandler for GameState {
     }
 }
 
-
 fn main() {
     let resource_dir = if let Ok(manifest_dir) = env::var("CARGO_MANIFEST_DIR") {
         let mut path = path::PathBuf::from(manifest_dir);
@@ -258,13 +255,11 @@ fn main() {
 
     let config = conf::Conf::new();
 
-    let (ref mut ctx, ref mut event_loop) =
-        ContextBuilder::new("hello_ggez", "isometric_fighting")
+    let (ref mut ctx, ref mut event_loop) = ContextBuilder::new("hello_ggez", "isometric_fighting")
         .add_resource_path(resource_dir)
         .conf(config)
         .build()
         .unwrap();
-
 
     const DESIRED_FPS: u32 = 60;
     let state = &mut GameState::new(ctx, DESIRED_FPS).unwrap();
