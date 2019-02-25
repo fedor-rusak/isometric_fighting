@@ -1,6 +1,6 @@
 [package]
 name = "isometric_fighting"
-version = "0.1.11"
+version = "0.1.12"
 authors = ["Fedor Rusak <node@fedor-rusak.ru>"]
 edition = "2018"
 
@@ -10,7 +10,7 @@ cgmath = { version = "0.16", features = ["mint"]}
 
 [dependencies.ggez]
 git="https://github.com/ggez/ggez"
-rev = "60cfa61dcf6a45ba381a39874fb13e37ad6e3bd6"
+rev = "bf1db8501bf8fcf29c773d8e497440312b9541b3"
 
 [profile.dev]
 opt-level=2

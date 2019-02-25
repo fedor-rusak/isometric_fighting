@@ -38,6 +38,8 @@ Gots some wishes about destructuring but that is a super minor issue.
 
 Keeping code at least somewhat readable is hard, yet it give opportunity to add features easily. And rust feels like a nice tool to refactor existing code even if you forgot some details about its logic.
 
+I still have some fun experience with this little project. And while I do some small steps, author and other contributors do different things and I should not forget to update GGEZ package :).
+
 # Things to try
 
 Do some perspective rendering and image movement. Done!

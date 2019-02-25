@@ -15,6 +15,10 @@ cargo run
 
 ## History
 
+### 0.1.12
+ - GGEZ version updated!
+ - Sound volume can be set before playing!
+
 ### 0.1.11
  - Camera as established mechanism!
  - Camera moves with avatar!
