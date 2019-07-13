@@ -1,4 +1,5 @@
 # isometric-fighting
+[![license](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
 
 This is a playground for Rust programming language and idea of fighting game implemented with isometric perspective.
 
@@ -14,6 +15,9 @@ cargo run
 ```
 
 ## History
+
+### 0.1.14
+ - License fix
 
 ### 0.1.13
  - GGEZ version updated

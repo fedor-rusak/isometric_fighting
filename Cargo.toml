@@ -1,8 +1,9 @@
 [package]
 name = "isometric_fighting"
-version = "0.1.13"
+version = "0.1.14"
 authors = ["Fedor Rusak <node@fedor-rusak.ru>"]
 edition = "2018"
+license = "MIT"
 
 [dependencies]
 cgmath = { version = "0.16", features = ["mint"]}
