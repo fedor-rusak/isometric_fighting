@@ -6,9 +6,9 @@ use std::env;
 use std::path;
 use std::time::Duration;
 
-use ggez::event::{self, Button, KeyCode, KeyMods};
-use ggez::*;
 use ggez::audio::SoundSource;
+use ggez::event::{self, KeyCode, KeyMods};
+use ggez::*;
 
 struct AvatarState {
     pos_x: f32,
@@ -131,6 +131,8 @@ impl GameState {
     }
 }
 
+/// This method *hides* some complexity to move things in isometric perspective
+/// using actually 3d coords.
 fn project(
     projection: &Projection,
     tile_dimensions: &TileDimensions,
@@ -241,9 +243,10 @@ impl ggez::event::EventHandler for GameState {
     fn draw(&mut self, ctx: &mut Context) -> GameResult {
         // println!("Draw event! time_passed_from_last_frame = {}ns", self.time_passed_from_last_frame.subsec_nanos());
 
+        //we fill screen with fixed color
         graphics::clear(ctx, [0.1, 0.2, 0.3, 1.0].into());
 
-        //floor
+        //floor drawing
         for i in 0..20 {
             for j in 0..20 {
                 let tile_start_pos_x = self.tile_dimensions.world_width * i as f32;
@@ -270,6 +273,7 @@ impl ggez::event::EventHandler for GameState {
             }
         }
 
+        //avatar
         {
             let (avatar_x, avatar_y) = project(
                 &self.projection,
@@ -348,10 +352,6 @@ impl ggez::event::EventHandler for GameState {
             }
             _ => (), // Do nothing
         }
-    }
-
-    fn controller_button_down_event(&mut self, _ctx: &mut Context, btn: Button, id: usize) {
-        println!("Controller button pressed: {:?} Controller_Id: {}", btn, id);
     }
 }
 

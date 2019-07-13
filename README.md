@@ -15,6 +15,11 @@ cargo run
 
 ## History
 
+### 0.1.13
+ - GGEZ version updated
+ - Some comments
+ - Removed deprecated gamepad support
+
 ### 0.1.12
  - GGEZ version updated!
  - Sound volume can be set before playing!
