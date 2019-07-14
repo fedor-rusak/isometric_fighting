@@ -23,6 +23,9 @@ Esc to exit.
 
 ## History
 
+### 0.1.16
+ - Now we can't step in them. So they are more like rocks than pits :)
+
 ### 0.1.15
  - Now we can do pits in our system
 

@@ -167,7 +167,11 @@ fn project(
     (result_x, result_y)
 }
 
-fn handle_movement_input(input_state: &InputState, x: f32, y: f32) -> (f32, f32) {
+fn handle_movement_input(
+    input_state: &InputState,
+     old_x: f32, old_y: f32,
+     pits: &Vec<String>,
+     tile_dimensions: &TileDimensions) -> (f32, f32) {
     //movement is calculated in 'world' coordinates. NOT projection pixels!
     let modifier =
         if (input_state.up || input_state.down) && (input_state.left || input_state.right) {
@@ -194,8 +198,17 @@ fn handle_movement_input(input_state: &InputState, x: f32, y: f32) -> (f32, f32)
         0.0
     };
 
-    let result_x = x + xaxis * input_state.speed * modifier;
-    let result_y = y + yaxis * input_state.speed * modifier;
+    let mut result_x = old_x + xaxis * input_state.speed * modifier;
+    let mut result_y = old_y + yaxis * input_state.speed * modifier;
+
+    let key = format!("{}_{}",
+        (result_x / tile_dimensions.world_width) as i32,
+        (result_y / tile_dimensions.world_length) as i32);
+
+    if pits.contains(&key) {
+        result_x = old_x;
+        result_y = old_y;
+    }
 
     (result_x, result_y)
 }
@@ -213,6 +226,8 @@ impl ggez::event::EventHandler for GameState {
             &self.input,
             self.avatar_state.pos_x,
             self.avatar_state.pos_y,
+            &self.pits,
+            &self.tile_dimensions
         );
         self.avatar_state.pos_x = new_x;
         self.avatar_state.pos_y = new_y;
