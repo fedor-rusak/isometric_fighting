@@ -10,6 +10,10 @@ use ggez::audio::SoundSource;
 use ggez::event::{self, KeyCode, KeyMods};
 use ggez::*;
 
+macro_rules! vec_of_strings {
+    ($($x:expr),*) => (vec![$($x.to_string()),*]);
+}
+
 struct AvatarState {
     pos_x: f32,
     pos_y: f32,
@@ -55,6 +59,7 @@ struct FloorImgStruct {
     // height: f32, //not used :\
     default: graphics::Image,
     colored: graphics::Image,
+    pit: graphics::Image,
 }
 
 struct Projection {
@@ -76,18 +81,22 @@ struct GameState {
     avatar_img_struct: AvatarImgStruct,
     sound: audio::Source,
     background_audio: audio::Source,
+    pits: Vec<String>
 }
 
 impl GameState {
     fn new(ctx: &mut Context, fps: u32) -> GameResult<GameState> {
         let floor_tile = graphics::Image::new(ctx, "/tile.png")?;
         let floor_tile_colored = graphics::Image::new(ctx, "/tile_colored.png")?;
+        let floor_tile_colored_pit = graphics::Image::new(ctx, "/tile_colored_pit.png")?;
         let avatar_face = graphics::Image::new(ctx, "/avatar.png")?;
         let avatar_face_other_angle = graphics::Image::new(ctx, "/avatar_other_angle.png")?;
         let mut grass_step = audio::Source::new(ctx, "/grass_foot_step.ogg")?;
         grass_step.set_volume(0.5);
         let mut river_and_birds = audio::Source::new(ctx, "/river_and_birds.ogg")?;
         river_and_birds.set_repeat(true);
+
+        let pits = vec_of_strings!("1_1", "1_2", "1_3");
 
         let state = GameState {
             avatar_state: AvatarState {
@@ -116,6 +125,7 @@ impl GameState {
                 // height: 60.0,  /not used :\
                 default: floor_tile,
                 colored: floor_tile_colored,
+                pit: floor_tile_colored_pit
             },
             avatar_img_struct: AvatarImgStruct {
                 width: 100.0,
@@ -125,6 +135,7 @@ impl GameState {
             },
             sound: grass_step,
             background_audio: river_and_birds,
+            pits: pits
         };
 
         Ok(state)
@@ -265,6 +276,8 @@ impl ggez::event::EventHandler for GameState {
 
                 let image = if self.visited_tiles_map.contains_key(&key) {
                     &self.floor_img_struct.colored
+                } else if self.pits.contains(&key) {
+                    &self.floor_img_struct.pit
                 } else {
                     &self.floor_img_struct.default
                 };

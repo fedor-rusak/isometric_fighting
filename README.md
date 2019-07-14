@@ -13,8 +13,18 @@ Run this inside cloned project:
 ```
 cargo run
 ```
+## Usage instructions
+
+Keyboard arrows to move.
+
+Space to reset to default state.
+
+Esc to exit.
 
 ## History
+
+### 0.1.15
+ - Now we can do pits in our system
 
 ### 0.1.14
  - License fix

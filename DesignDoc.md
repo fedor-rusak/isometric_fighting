@@ -40,6 +40,10 @@ Keeping code at least somewhat readable is hard, yet it give opportunity to add 
 
 I still have some fun experience with this little project. And while I do some small steps, author and other contributors do different things and I should not forget to update GGEZ package :).
 
+# Implementation explained (at least some parts)
+
+We have a separate storage with coordinates of tiles we consider pits. In future they should not allow to step on them and force you to move around them. This is a beginning of a collision detection system.
+
 # Things to try
 
 Do some perspective rendering and image movement. Done!
