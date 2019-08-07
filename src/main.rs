@@ -252,7 +252,10 @@ impl ggez::event::EventHandler for GameState {
         let tile_i = (self.avatar_state.pos_x / self.tile_dimensions.world_width) as i32;
         let tile_j = (self.avatar_state.pos_y / self.tile_dimensions.world_length) as i32;
 
-        let key = format!("{}_{}", tile_i, tile_j);
+        let final_tile_i = if self.avatar_state.pos_x < 0.0 { tile_i-1 } else { tile_i };
+        let final_tile_j = if self.avatar_state.pos_y < 0.0 { tile_j-1 } else { tile_j };
+
+        let key = format!("{}_{}", final_tile_i, final_tile_j);
 
         self.visited_tiles_map.entry(key).or_insert(true);
 
@@ -352,7 +355,7 @@ impl ggez::event::EventHandler for GameState {
                 self.input.right = true;
                 self.input.left = false;
             }
-            KeyCode::Escape => quit(ctx),
+            KeyCode::Escape => event::quit(ctx),
             _ => (), // Do nothing
         }
     }

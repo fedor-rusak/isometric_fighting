@@ -23,6 +23,10 @@ Esc to exit.
 
 ## History
 
+### 0.1.17
+ - GGEZ update
+ - bugfix for negative coords and tile visiting
+
 ### 0.1.16
  - Now we can't step in them. So they are more like rocks than pits :)
 
