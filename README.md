@@ -34,6 +34,9 @@ Esc to exit.
 
 ## History
 
+### 0.1.22
+ - Flipped x-axis and y-axis
+
 ### 0.1.21
  - Import simplification
 

@@ -56,7 +56,7 @@ struct AvatarImgStruct {
 
 struct FloorImgStruct {
     width: f32,
-    // height: f32, //not used :\
+    height: f32,
     default: graphics::Image,
     colored: graphics::Image,
     pit: graphics::Image,
@@ -122,7 +122,7 @@ impl GameState {
             visited_tiles_map: HashMap::new(),
             floor_img_struct: FloorImgStruct {
                 width: 100.0,
-                // height: 60.0,  /not used :\
+                height: 60.0,
                 default: floor_tile,
                 colored: floor_tile_colored,
                 pit: floor_tile_colored_pit
@@ -135,7 +135,7 @@ impl GameState {
             },
             sound: grass_step,
             background_audio: river_and_birds,
-            pits: pits
+            pits
         };
 
         Ok(state)
@@ -156,14 +156,14 @@ fn project(
 
     let &Projection{width, camera_center_pos_x, height, camera_center_pos_y} = projection;
     let camera_shift_x = (width / 2.0)
-        - (camera_center_pos_x - camera_center_pos_y)
+        + (camera_center_pos_x - camera_center_pos_y)
             * pixels_moved_per_x_one_step;
     let camera_shift_y = (height / 2.0)
-        - (camera_center_pos_x + camera_center_pos_y)
+        + (camera_center_pos_x + camera_center_pos_y)
             * pixels_moved_per_y_one_step;
 
-    let result_x = camera_shift_x + (x - y) * pixels_moved_per_x_one_step;
-    let result_y = camera_shift_y + (x + y) * pixels_moved_per_y_one_step;
+    let result_x = camera_shift_x - (x - y) * pixels_moved_per_x_one_step;
+    let result_y = camera_shift_y - (x + y) * pixels_moved_per_y_one_step;
 
     (result_x, result_y)
 }
@@ -171,7 +171,7 @@ fn project(
 fn handle_movement_input(
     input_state: &InputState,
      old_x: f32, old_y: f32,
-     pits: &Vec<String>,
+     pits: &[String],
      tile_dimensions: &TileDimensions) -> (f32, f32) {
     let &InputState{up, down, left, right, speed} = input_state;
 
@@ -185,18 +185,18 @@ fn handle_movement_input(
 
     let xaxis = if (left && !down) || (up && !right)
     {
-        -1.0
-    } else if (!left && down) || (!up && right) {
         1.0
+    } else if (!left && down) || (!up && right) {
+        -1.0
     } else {
         0.0
     };
 
     let yaxis = if (left && !up) || (down && !right)
     {
-        1.0
-    } else if (!left && up) || (!down && right) {
         -1.0
+    } else if (!left && up) || (!down && right) {
+        1.0
     } else {
         0.0
     };
@@ -303,7 +303,10 @@ impl ggez::event::EventHandler for GameState {
                     tile_start_pos_y,
                 );
                 //because 0,0 of tile is top,center of actual image in isometric projection
-                let render_coords = mint::Point2{x: x - self.floor_img_struct.width / 2.0, y};
+                let render_coords = mint::Point2{
+                    x: x - self.floor_img_struct.width / 2.0,
+                    y: y - self.floor_img_struct.height
+                };
 
                 let key = to_map_index(i, j);
 
