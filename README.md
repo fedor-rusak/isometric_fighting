@@ -3,6 +3,8 @@
 
 This is a playground for Rust programming language and idea of fighting game implemented with isometric perspective.
 
+To have some info about Rust language please check [Rust Language Cheat Sheet](https://cheats.rs/).
+
 ## Build instructions
 
 Install rust via rustup.
@@ -13,6 +15,15 @@ Run this inside cloned project:
 ```
 cargo run
 ```
+
+## Build instructions for Mac
+
+Checked it on Mojave and everything worked after this:
+
+```
+sudo installer -pkg /Library/Developer/CommandLineTools/Packages/macOS_SDK_headers_for_macOS_10.14.pkg -target /
+```
+
 ## Usage instructions
 
 Keyboard arrows to move.
@@ -22,6 +33,9 @@ Space to reset to default state.
 Esc to exit.
 
 ## History
+
+### 0.1.19
+ - Docs updated!
 
 ### 0.1.18
  - Refactored and fixed to_map_index logic
