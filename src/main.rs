@@ -150,15 +150,16 @@ fn project(
     x: f32,
     y: f32,
 ) -> (f32, f32) {
-    let pixels_moved_per_x_one_step = tile_dimensions.projected_width / tile_dimensions.world_width;
-    let pixels_moved_per_y_one_step =
-        tile_dimensions.projected_height / tile_dimensions.world_length;
+    let &TileDimensions{projected_width, world_width, projected_height, world_length} = tile_dimensions;
+    let pixels_moved_per_x_one_step = projected_width / world_width;
+    let pixels_moved_per_y_one_step = projected_height / world_length;
 
-    let camera_shift_x = (projection.width / 2.0)
-        - (projection.camera_center_pos_x - projection.camera_center_pos_y)
+    let &Projection{width, camera_center_pos_x, height, camera_center_pos_y} = projection;
+    let camera_shift_x = (width / 2.0)
+        - (camera_center_pos_x - camera_center_pos_y)
             * pixels_moved_per_x_one_step;
-    let camera_shift_y = (projection.height / 2.0)
-        - (projection.camera_center_pos_x + projection.camera_center_pos_y)
+    let camera_shift_y = (height / 2.0)
+        - (camera_center_pos_x + camera_center_pos_y)
             * pixels_moved_per_y_one_step;
 
     let result_x = camera_shift_x + (x - y) * pixels_moved_per_x_one_step;
@@ -172,45 +173,47 @@ fn handle_movement_input(
      old_x: f32, old_y: f32,
      pits: &Vec<String>,
      tile_dimensions: &TileDimensions) -> (f32, f32) {
+    let &InputState{up, down, left, right, speed} = input_state;
+
     //movement is calculated in 'world' coordinates. NOT projection pixels!
     let modifier =
-        if (input_state.up || input_state.down) && (input_state.left || input_state.right) {
+        if (up || down) && (left || right) {
             0.85 //diagonal movement for 1.0 means sin45*1.0
         } else {
             1.0
         };
 
-    let xaxis = if (input_state.left && !input_state.down) || (input_state.up && !input_state.right)
+    let xaxis = if (left && !down) || (up && !right)
     {
         -1.0
-    } else if (!input_state.left && input_state.down) || (!input_state.up && input_state.right) {
+    } else if (!left && down) || (!up && right) {
         1.0
     } else {
         0.0
     };
 
-    let yaxis = if (input_state.left && !input_state.up) || (input_state.down && !input_state.right)
+    let yaxis = if (left && !up) || (down && !right)
     {
         1.0
-    } else if (!input_state.left && input_state.up) || (!input_state.down && input_state.right) {
+    } else if (!left && up) || (!down && right) {
         -1.0
     } else {
         0.0
     };
 
-    let mut result_x = old_x + xaxis * input_state.speed * modifier;
-    let mut result_y = old_y + yaxis * input_state.speed * modifier;
+    let result_x = old_x + xaxis * speed * modifier;
+    let result_y = old_y + yaxis * speed * modifier;
 
     let key = f_to_map_index(
         result_x / tile_dimensions.world_width,
         result_y / tile_dimensions.world_length);
 
     if pits.contains(&key) {
-        result_x = old_x;
-        result_y = old_y;
+        (old_x, old_y)
     }
-
-    (result_x, result_y)
+    else {
+        (result_x, result_y)
+    }
 }
 
 fn is_moving(input_state: &InputState) -> bool {

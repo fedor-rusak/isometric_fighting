@@ -34,6 +34,10 @@ Esc to exit.
 
 ## History
 
+
+### 0.1.20
+ - Simplified some code with pattern matchings (more like destructure usage)
+
 ### 0.1.19
  - Docs updated!
 
