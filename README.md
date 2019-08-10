@@ -34,6 +34,8 @@ Esc to exit.
 
 ## History
 
+### 0.1.21
+ - Import simplification
 
 ### 0.1.20
  - Simplified some code with pattern matchings (more like destructure usage)

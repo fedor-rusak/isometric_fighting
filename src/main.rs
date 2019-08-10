@@ -1,4 +1,3 @@
-extern crate cgmath;
 extern crate ggez;
 
 use std::collections::HashMap;
@@ -7,8 +6,9 @@ use std::path;
 use std::time::Duration;
 
 use ggez::audio::SoundSource;
-use ggez::event::{self, KeyCode, KeyMods};
-use ggez::*;
+use ggez::event::{KeyCode, KeyMods};
+use ggez::{event, audio, mint, graphics, conf, timer, ContextBuilder, Context};
+use ggez::error::GameResult;
 
 macro_rules! vec_of_strings {
     ($($x:expr),*) => (vec![$($x.to_string()),*]);
@@ -303,7 +303,7 @@ impl ggez::event::EventHandler for GameState {
                     tile_start_pos_y,
                 );
                 //because 0,0 of tile is top,center of actual image in isometric projection
-                let render_coords = cgmath::Point2::new(x - self.floor_img_struct.width / 2.0, y);
+                let render_coords = mint::Point2{x: x - self.floor_img_struct.width / 2.0, y};
 
                 let key = to_map_index(i, j);
 
@@ -328,10 +328,10 @@ impl ggez::event::EventHandler for GameState {
                 self.avatar_state.pos_y,
             );
             //because avatar image center (ant not left top corner) represents character position
-            let render_coords = cgmath::Point2::new(
-                avatar_x - self.avatar_img_struct.width / 2.0,
-                avatar_y - self.avatar_img_struct.height / 2.0,
-            );
+            let render_coords = mint::Point2{
+                x: avatar_x - self.avatar_img_struct.width / 2.0,
+                y: avatar_y - self.avatar_img_struct.height / 2.0,
+            };
 
             let to_draw = if self.avatar_state.direction_is_diagonal {
                 &self.avatar_img_struct.avatar
