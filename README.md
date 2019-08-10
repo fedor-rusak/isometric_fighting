@@ -23,6 +23,9 @@ Esc to exit.
 
 ## History
 
+### 0.1.18
+ - Refactored and fixed to_map_index logic
+
 ### 0.1.17
  - GGEZ update
  - bugfix for negative coords and tile visiting

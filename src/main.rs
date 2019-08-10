@@ -96,7 +96,7 @@ impl GameState {
         let mut river_and_birds = audio::Source::new(ctx, "/river_and_birds.ogg")?;
         river_and_birds.set_repeat(true);
 
-        let pits = vec_of_strings!("1_1", "1_2", "1_3");
+        let pits = vec_of_strings!("1_1", "1_2", "1_3", "-1_-1");
 
         let state = GameState {
             avatar_state: AvatarState {
@@ -201,9 +201,9 @@ fn handle_movement_input(
     let mut result_x = old_x + xaxis * input_state.speed * modifier;
     let mut result_y = old_y + yaxis * input_state.speed * modifier;
 
-    let key = format!("{}_{}",
-        (result_x / tile_dimensions.world_width) as i32,
-        (result_y / tile_dimensions.world_length) as i32);
+    let key = f_to_map_index(
+        result_x / tile_dimensions.world_width,
+        result_y / tile_dimensions.world_length);
 
     if pits.contains(&key) {
         result_x = old_x;
@@ -215,6 +215,21 @@ fn handle_movement_input(
 
 fn is_moving(input_state: &InputState) -> bool {
     input_state.up || input_state.down || input_state.left || input_state.right
+}
+
+fn compensate_rounding_for_negative(input: f32) -> f32 {
+    if input < 0.0 { input - 1.0 } else { input }
+}
+
+fn to_map_index(tile_i: i32, tile_j: i32) -> String {
+    format!("{}_{}", tile_i, tile_j)
+}
+
+fn f_to_map_index(tile_i: f32, tile_j: f32) -> String {
+    let final_tile_i = compensate_rounding_for_negative(tile_i) as i32;
+    let final_tile_j = compensate_rounding_for_negative(tile_j) as i32;
+
+    to_map_index(final_tile_i, final_tile_j)
 }
 
 impl ggez::event::EventHandler for GameState {
@@ -249,13 +264,10 @@ impl ggez::event::EventHandler for GameState {
         }
 
         //collision detection
-        let tile_i = (self.avatar_state.pos_x / self.tile_dimensions.world_width) as i32;
-        let tile_j = (self.avatar_state.pos_y / self.tile_dimensions.world_length) as i32;
+        let tile_i = self.avatar_state.pos_x / self.tile_dimensions.world_width;
+        let tile_j = self.avatar_state.pos_y / self.tile_dimensions.world_length;
 
-        let final_tile_i = if self.avatar_state.pos_x < 0.0 { tile_i-1 } else { tile_i };
-        let final_tile_j = if self.avatar_state.pos_y < 0.0 { tile_j-1 } else { tile_j };
-
-        let key = format!("{}_{}", final_tile_i, final_tile_j);
+        let key = f_to_map_index(tile_i, tile_j);
 
         self.visited_tiles_map.entry(key).or_insert(true);
 
@@ -276,8 +288,8 @@ impl ggez::event::EventHandler for GameState {
         graphics::clear(ctx, [0.1, 0.2, 0.3, 1.0].into());
 
         //floor drawing
-        for i in 0..20 {
-            for j in 0..20 {
+        for i in -1..20 {
+            for j in -1..20 {
                 let tile_start_pos_x = self.tile_dimensions.world_width * i as f32;
                 let tile_start_pos_y = self.tile_dimensions.world_length * j as f32;
 
@@ -290,7 +302,7 @@ impl ggez::event::EventHandler for GameState {
                 //because 0,0 of tile is top,center of actual image in isometric projection
                 let render_coords = cgmath::Point2::new(x - self.floor_img_struct.width / 2.0, y);
 
-                let key = format!("{}_{}", i, j);
+                let key = to_map_index(i, j);
 
                 let image = if self.visited_tiles_map.contains_key(&key) {
                     &self.floor_img_struct.colored
