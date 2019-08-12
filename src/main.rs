@@ -14,10 +14,12 @@ macro_rules! vec_of_strings {
     ($($x:expr),*) => (vec![$($x.to_string()),*]);
 }
 
+// enum Direction {Up, UpRight, Right, RighDown, Down, DownLeft, Left, LeftUp}
+
 struct AvatarState {
     pos_x: f32,
     pos_y: f32,
-    direction_is_diagonal: bool,
+    direction: bool,
 }
 
 struct InputState {
@@ -102,7 +104,7 @@ impl GameState {
             avatar_state: AvatarState {
                 pos_x: 15.0, //current avatar X in 'world' coords
                 pos_y: 15.0, //current avatar Y in 'world' coords
-                direction_is_diagonal: false,
+                direction: false,
             },
             fps,
             tile_dimensions: TileDimensions {
@@ -253,7 +255,7 @@ impl ggez::event::EventHandler for GameState {
         self.projection.camera_center_pos_y = new_y;
 
         if is_moving(&self.input) {
-            self.avatar_state.direction_is_diagonal =
+            self.avatar_state.direction =
                 (self.input.up || self.input.down) && (self.input.left || self.input.right);
         }
 
@@ -336,7 +338,7 @@ impl ggez::event::EventHandler for GameState {
                 y: avatar_y - self.avatar_img_struct.height / 2.0,
             };
 
-            let to_draw = if self.avatar_state.direction_is_diagonal {
+            let to_draw = if self.avatar_state.direction {
                 &self.avatar_img_struct.avatar
             } else {
                 &self.avatar_img_struct.avatar_other_angle
