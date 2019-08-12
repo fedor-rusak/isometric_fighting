@@ -24,18 +24,19 @@ enum Direction {
     Left,
     LeftUp,
 }
+use Direction::*;
 
 struct AvatarState {
     pos_x: f32,
     pos_y: f32,
-    direction: bool,
+    direction: Direction,
 }
 
 struct InputState {
     up: bool,
+    right: bool,
     down: bool,
     left: bool,
-    right: bool,
     speed: f32,
 }
 
@@ -43,9 +44,9 @@ impl Default for InputState {
     fn default() -> Self {
         InputState {
             up: false,
+            right: false,
             down: false,
             left: false,
-            right: false,
             speed: 1.5,
         }
     }
@@ -113,7 +114,7 @@ impl GameState {
             avatar_state: AvatarState {
                 pos_x: 15.0, //current avatar X in 'world' coords
                 pos_y: 15.0, //current avatar Y in 'world' coords
-                direction: false,
+                direction: Down,
             },
             fps,
             tile_dimensions: TileDimensions {
@@ -200,22 +201,22 @@ fn handle_movement_input(
 ) -> (f32, f32, Direction) {
     let &InputState {
         up,
+        right,
         down,
         left,
-        right,
         speed,
     } = input_state;
 
-    let (xaxis, yaxis, direction) = match (left, down, up, right) {
-        (false, false, true, false) => (0.85, 0.85, Direction::Up),
-        (false, false, true, true) => (0.0, 1.0, Direction::UpRight),
-        (false, false, false, true) => (-0.85, 0.85, Direction::Right),
-        (false, true, false, true) => (-1.0, 0.0, Direction::RightDown),
-        (false, true, false, false) => (-0.85, -0.85, Direction::Down),
-        (true, true, false, false) => (0.0, -1.0, Direction::DownLeft),
-        (true, false, false, false) => (0.85, -0.85, Direction::Left),
-        (true, false, true, false) => (1.0, 0.0, Direction::LeftUp),
-        _ => (0.0, 0.0, Direction::Down),
+    let (xaxis, yaxis, direction) = match (up, right, down, left) {
+        (true, false, false, false) => (0.85, 0.85, Up),
+        (true, true, false, false) => (0.0, 1.0, UpRight),
+        (false, true, false, false) => (-0.85, 0.85, Right),
+        (false, true, true, false) => (-1.0, 0.0, RightDown),
+        (false, false, true, false) => (-0.85, -0.85, Down),
+        (false, false, true, true) => (0.0, -1.0, DownLeft),
+        (false, false, false, true) => (0.85, -0.85, Left),
+        (true, false, false, true) => (1.0, 0.0, LeftUp),
+        _ => (0.0, 0.0, Down),
     };
 
     let result_x = old_x + xaxis * speed;
@@ -261,7 +262,7 @@ impl ggez::event::EventHandler for GameState {
         let mut timeframe = Duration::new(0, 0);
 
         //movement
-        let (new_x, new_y, _) = handle_movement_input(
+        let (new_x, new_y, direction) = handle_movement_input(
             &self.input,
             self.avatar_state.pos_x,
             self.avatar_state.pos_y,
@@ -270,13 +271,11 @@ impl ggez::event::EventHandler for GameState {
         );
         self.avatar_state.pos_x = new_x;
         self.avatar_state.pos_y = new_y;
+        self.avatar_state.direction = direction;
+
+        //camera
         self.projection.camera_center_pos_x = new_x;
         self.projection.camera_center_pos_y = new_y;
-
-        if is_moving(&self.input) {
-            self.avatar_state.direction =
-                (self.input.up || self.input.down) && (self.input.left || self.input.right);
-        }
 
         //sound
         if is_moving(&self.input) && !self.sound.playing() {
@@ -357,10 +356,9 @@ impl ggez::event::EventHandler for GameState {
                 y: avatar_y - self.avatar_img_struct.height / 2.0,
             };
 
-            let to_draw = if self.avatar_state.direction {
-                &self.avatar_img_struct.avatar
-            } else {
-                &self.avatar_img_struct.avatar_other_angle
+            let to_draw = match self.avatar_state.direction {
+                Left | Right | Up | Down => &self.avatar_img_struct.avatar_other_angle,
+                LeftUp | RightDown | UpRight | DownLeft => &self.avatar_img_struct.avatar,
             };
 
             graphics::draw(ctx, to_draw, (render_coords,))?;
@@ -416,6 +414,7 @@ impl ggez::event::EventHandler for GameState {
             KeyCode::Space => {
                 self.avatar_state.pos_x = 15.0;
                 self.avatar_state.pos_y = 15.0;
+                self.avatar_state.direction = Direction::Down;
                 self.projection.camera_center_pos_x = 15.0;
                 self.projection.camera_center_pos_y = 15.0;
                 self.visited_tiles_map = HashMap::new();
