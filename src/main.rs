@@ -14,7 +14,7 @@ macro_rules! vec_of_strings {
     ($($x:expr),*) => (vec![$($x.to_string()),*]);
 }
 
-// enum Direction {Up, UpRight, Right, RighDown, Down, DownLeft, Left, LeftUp}
+enum Direction {Up, UpRight, Right, RightDown, Down, DownLeft, Left, LeftUp}
 
 struct AvatarState {
     pos_x: f32,
@@ -170,45 +170,41 @@ fn project(
     (result_x, result_y)
 }
 
+/// This method does some trickery to handle arrow key input into movement in
+/// isometric space.
+/// Movement is calculated in 'world' coordinates. NOT projection pixels!
+/// Diagonal movement for step of 1.0 means sin45*1.0 = 0.85
 fn handle_movement_input(
     input_state: &InputState,
      old_x: f32, old_y: f32,
      pits: &[String],
-     tile_dimensions: &TileDimensions) -> (f32, f32) {
+     tile_dimensions: &TileDimensions) -> (f32, f32, Direction) {
     let &InputState{up, down, left, right, speed} = input_state;
 
-    //movement is calculated in 'world' coordinates. NOT projection pixels!
-    let modifier =
-        if (up || down) && (left || right) {
-            0.85 //diagonal movement for 1.0 means sin45*1.0
-        } else {
-            1.0
-        };
-
-    let xaxis = match (left, down, up, right) {
-        (true, false, _, _) | (_, _, true, false) => 1.0,
-        (false, true, _, _) | (_, _, false, true) => -1.0,
-        _ => 0.0
+    let (xaxis, yaxis, direction) = match (left, down, up, right) {
+        (false, false, true, false) => (0.85, 0.85, Direction::Up),
+        (false, false, true, true) => (0.0, 1.0, Direction::UpRight),
+        (false, false, false, true) => (-0.85, 0.85, Direction::Right),
+        (false, true, false, true) => (-1.0, 0.0, Direction::RightDown),
+        (false, true, false, false) => (-0.85, -0.85, Direction::Down),
+        (true, true, false, false) => (0.0, -1.0, Direction::DownLeft),
+        (true, false, false, false) => (0.85, -0.85, Direction::Left),
+        (true, false, true, false) => (1.0, 0.0, Direction::LeftUp),
+        _ => (0.0, 0.0, Direction::Down)
     };
 
-    let yaxis = match (left, down, up, right) {
-        (true, _, false, _) | (_, true, _, false) => -1.0,
-        (false, _, true, _) | (_, false, _, true) => 1.0,
-        _ => 0.0
-    };
-
-    let result_x = old_x + xaxis * speed * modifier;
-    let result_y = old_y + yaxis * speed * modifier;
+    let result_x = old_x + xaxis * speed;
+    let result_y = old_y + yaxis * speed;
 
     let key = f_to_map_index(
         result_x / tile_dimensions.world_width,
         result_y / tile_dimensions.world_length);
 
     if pits.contains(&key) {
-        (old_x, old_y)
+        (old_x, old_y, direction)
     }
     else {
-        (result_x, result_y)
+        (result_x, result_y, direction)
     }
 }
 
@@ -236,7 +232,7 @@ impl ggez::event::EventHandler for GameState {
         let mut timeframe = Duration::new(0, 0);
 
         //movement
-        let (new_x, new_y) = handle_movement_input(
+        let (new_x, new_y, _) = handle_movement_input(
             &self.input,
             self.avatar_state.pos_x,
             self.avatar_state.pos_y,
