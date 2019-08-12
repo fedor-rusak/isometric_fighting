@@ -185,22 +185,16 @@ fn handle_movement_input(
             1.0
         };
 
-    let xaxis = if (left && !down) || (up && !right)
-    {
-        1.0
-    } else if (!left && down) || (!up && right) {
-        -1.0
-    } else {
-        0.0
+    let xaxis = match (left, down, up, right) {
+        (true, false, _, _) | (_, _, true, false) => 1.0,
+        (false, true, _, _) | (_, _, false, true) => -1.0,
+        _ => 0.0
     };
 
-    let yaxis = if (left && !up) || (down && !right)
-    {
-        -1.0
-    } else if (!left && up) || (!down && right) {
-        1.0
-    } else {
-        0.0
+    let yaxis = match (left, down, up, right) {
+        (true, _, false, _) | (_, true, _, false) => -1.0,
+        (false, _, true, _) | (_, false, _, true) => 1.0,
+        _ => 0.0
     };
 
     let result_x = old_x + xaxis * speed * modifier;
