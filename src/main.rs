@@ -6,25 +6,39 @@ use std::path;
 use std::time::Duration;
 
 use ggez::audio::SoundSource;
-use ggez::event::{KeyCode, KeyMods};
-use ggez::{event, audio, mint, graphics, conf, timer, ContextBuilder, Context};
 use ggez::error::GameResult;
+use ggez::event::{KeyCode, KeyMods};
+use ggez::{audio, conf, event, graphics, mint, timer, Context, ContextBuilder};
 
 macro_rules! vec_of_strings {
     ($($x:expr),*) => (vec![$($x.to_string()),*]);
 }
 
+#[derive(Debug, PartialEq, Eq, Hash)]
+enum Direction {
+    Up,
+    UpRight,
+    Right,
+    RightDown,
+    Down,
+    DownLeft,
+    Left,
+    LeftUp,
+}
+
+use Direction::*;
+
 struct AvatarState {
     pos_x: f32,
     pos_y: f32,
-    direction_is_diagonal: bool,
+    direction: Direction,
 }
 
 struct InputState {
     up: bool,
+    right: bool,
     down: bool,
     left: bool,
-    right: bool,
     speed: f32,
 }
 
@@ -32,9 +46,9 @@ impl Default for InputState {
     fn default() -> Self {
         InputState {
             up: false,
+            right: false,
             down: false,
             left: false,
-            right: false,
             speed: 1.5,
         }
     }
@@ -50,8 +64,7 @@ struct TileDimensions {
 struct AvatarImgStruct {
     width: f32,
     height: f32,
-    avatar: graphics::Image,
-    avatar_other_angle: graphics::Image,
+    avatar_images: HashMap<Direction, graphics::Image>,
 }
 
 struct FloorImgStruct {
@@ -81,7 +94,7 @@ struct GameState {
     avatar_img_struct: AvatarImgStruct,
     sound: audio::Source,
     background_audio: audio::Source,
-    pits: Vec<String>
+    pits: Vec<String>,
 }
 
 impl GameState {
@@ -89,8 +102,17 @@ impl GameState {
         let floor_tile = graphics::Image::new(ctx, "/tile.png")?;
         let floor_tile_colored = graphics::Image::new(ctx, "/tile_colored.png")?;
         let floor_tile_colored_pit = graphics::Image::new(ctx, "/tile_colored_pit.png")?;
-        let avatar_face = graphics::Image::new(ctx, "/avatar.png")?;
-        let avatar_face_other_angle = graphics::Image::new(ctx, "/avatar_other_angle.png")?;
+
+        let mut avatar_images: HashMap<Direction, graphics::Image> = HashMap::new();
+        avatar_images.insert(Down, graphics::Image::new(ctx, "/avatar_d.png")?);
+        avatar_images.insert(DownLeft, graphics::Image::new(ctx, "/avatar_dl.png")?);
+        avatar_images.insert(Left, graphics::Image::new(ctx, "/avatar_l.png")?);
+        avatar_images.insert(LeftUp, graphics::Image::new(ctx, "/avatar_lu.png")?);
+        avatar_images.insert(Up, graphics::Image::new(ctx, "/avatar_u.png")?);
+        avatar_images.insert(UpRight, graphics::Image::new(ctx, "/avatar_ur.png")?);
+        avatar_images.insert(Right, graphics::Image::new(ctx, "/avatar_r.png")?);
+        avatar_images.insert(RightDown, graphics::Image::new(ctx, "/avatar_rd.png")?);
+
         let mut grass_step = audio::Source::new(ctx, "/grass_foot_step.ogg")?;
         grass_step.set_volume(0.5);
         let mut river_and_birds = audio::Source::new(ctx, "/river_and_birds.ogg")?;
@@ -102,7 +124,7 @@ impl GameState {
             avatar_state: AvatarState {
                 pos_x: 15.0, //current avatar X in 'world' coords
                 pos_y: 15.0, //current avatar Y in 'world' coords
-                direction_is_diagonal: false,
+                direction: Down,
             },
             fps,
             tile_dimensions: TileDimensions {
@@ -125,17 +147,16 @@ impl GameState {
                 height: 60.0,
                 default: floor_tile,
                 colored: floor_tile_colored,
-                pit: floor_tile_colored_pit
+                pit: floor_tile_colored_pit,
             },
             avatar_img_struct: AvatarImgStruct {
                 width: 100.0,
                 height: 100.0,
-                avatar: avatar_face,
-                avatar_other_angle: avatar_face_other_angle,
+                avatar_images,
             },
             sound: grass_step,
             background_audio: river_and_birds,
-            pits
+            pits,
         };
 
         Ok(state)
@@ -150,17 +171,25 @@ fn project(
     x: f32,
     y: f32,
 ) -> (f32, f32) {
-    let &TileDimensions{projected_width, world_width, projected_height, world_length} = tile_dimensions;
+    let &TileDimensions {
+        projected_width,
+        world_width,
+        projected_height,
+        world_length,
+    } = tile_dimensions;
     let pixels_moved_per_x_one_step = projected_width / world_width;
     let pixels_moved_per_y_one_step = projected_height / world_length;
 
-    let &Projection{width, camera_center_pos_x, height, camera_center_pos_y} = projection;
-    let camera_shift_x = (width / 2.0)
-        + (camera_center_pos_x - camera_center_pos_y)
-            * pixels_moved_per_x_one_step;
-    let camera_shift_y = (height / 2.0)
-        + (camera_center_pos_x + camera_center_pos_y)
-            * pixels_moved_per_y_one_step;
+    let &Projection {
+        width,
+        camera_center_pos_x,
+        height,
+        camera_center_pos_y,
+    } = projection;
+    let camera_shift_x =
+        (width / 2.0) + (camera_center_pos_x - camera_center_pos_y) * pixels_moved_per_x_one_step;
+    let camera_shift_y =
+        (height / 2.0) + (camera_center_pos_x + camera_center_pos_y) * pixels_moved_per_y_one_step;
 
     let result_x = camera_shift_x - (x - y) * pixels_moved_per_x_one_step;
     let result_y = camera_shift_y - (x + y) * pixels_moved_per_y_one_step;
@@ -168,51 +197,49 @@ fn project(
     (result_x, result_y)
 }
 
+/// This method does some trickery to handle arrow key input into movement in
+/// isometric space.
+/// Movement is calculated in 'world' coordinates. NOT projection pixels!
+/// Diagonal movement for step of 1.0 means sin45*1.0 = 0.85
 fn handle_movement_input(
     input_state: &InputState,
-     old_x: f32, old_y: f32,
-     pits: &[String],
-     tile_dimensions: &TileDimensions) -> (f32, f32) {
-    let &InputState{up, down, left, right, speed} = input_state;
+    old_x: f32,
+    old_y: f32,
+    pits: &[String],
+    tile_dimensions: &TileDimensions,
+) -> (f32, f32, Direction) {
+    let &InputState {
+        up,
+        right,
+        down,
+        left,
+        speed,
+    } = input_state;
 
-    //movement is calculated in 'world' coordinates. NOT projection pixels!
-    let modifier =
-        if (up || down) && (left || right) {
-            0.85 //diagonal movement for 1.0 means sin45*1.0
-        } else {
-            1.0
-        };
-
-    let xaxis = if (left && !down) || (up && !right)
-    {
-        1.0
-    } else if (!left && down) || (!up && right) {
-        -1.0
-    } else {
-        0.0
+    let (xaxis, yaxis, direction) = match (up, right, down, left) {
+        (true, false, false, false) => (0.85, 0.85, Up),
+        (true, true, false, false) => (0.0, 1.0, UpRight),
+        (false, true, false, false) => (-0.85, 0.85, Right),
+        (false, true, true, false) => (-1.0, 0.0, RightDown),
+        (false, false, true, false) => (-0.85, -0.85, Down),
+        (false, false, true, true) => (0.0, -1.0, DownLeft),
+        (false, false, false, true) => (0.85, -0.85, Left),
+        (true, false, false, true) => (1.0, 0.0, LeftUp),
+        _ => (0.0, 0.0, Down),
     };
 
-    let yaxis = if (left && !up) || (down && !right)
-    {
-        -1.0
-    } else if (!left && up) || (!down && right) {
-        1.0
-    } else {
-        0.0
-    };
-
-    let result_x = old_x + xaxis * speed * modifier;
-    let result_y = old_y + yaxis * speed * modifier;
+    let result_x = old_x + xaxis * speed;
+    let result_y = old_y + yaxis * speed;
 
     let key = f_to_map_index(
         result_x / tile_dimensions.world_width,
-        result_y / tile_dimensions.world_length);
+        result_y / tile_dimensions.world_length,
+    );
 
     if pits.contains(&key) {
-        (old_x, old_y)
-    }
-    else {
-        (result_x, result_y)
+        (old_x, old_y, direction)
+    } else {
+        (result_x, result_y, direction)
     }
 }
 
@@ -221,7 +248,11 @@ fn is_moving(input_state: &InputState) -> bool {
 }
 
 fn compensate_rounding_for_negative(input: f32) -> f32 {
-    if input < 0.0 { input - 1.0 } else { input }
+    if input < 0.0 {
+        input - 1.0
+    } else {
+        input
+    }
 }
 
 fn to_map_index(tile_i: i32, tile_j: i32) -> String {
@@ -240,22 +271,20 @@ impl ggez::event::EventHandler for GameState {
         let mut timeframe = Duration::new(0, 0);
 
         //movement
-        let (new_x, new_y) = handle_movement_input(
+        let (new_x, new_y, direction) = handle_movement_input(
             &self.input,
             self.avatar_state.pos_x,
             self.avatar_state.pos_y,
             &self.pits,
-            &self.tile_dimensions
+            &self.tile_dimensions,
         );
         self.avatar_state.pos_x = new_x;
         self.avatar_state.pos_y = new_y;
+        self.avatar_state.direction = direction;
+
+        //camera
         self.projection.camera_center_pos_x = new_x;
         self.projection.camera_center_pos_y = new_y;
-
-        if is_moving(&self.input) {
-            self.avatar_state.direction_is_diagonal =
-                (self.input.up || self.input.down) && (self.input.left || self.input.right);
-        }
 
         //sound
         if is_moving(&self.input) && !self.sound.playing() {
@@ -303,9 +332,9 @@ impl ggez::event::EventHandler for GameState {
                     tile_start_pos_y,
                 );
                 //because 0,0 of tile is top,center of actual image in isometric projection
-                let render_coords = mint::Point2{
+                let render_coords = mint::Point2 {
                     x: x - self.floor_img_struct.width / 2.0,
-                    y: y - self.floor_img_struct.height
+                    y: y - self.floor_img_struct.height,
                 };
 
                 let key = to_map_index(i, j);
@@ -331,16 +360,16 @@ impl ggez::event::EventHandler for GameState {
                 self.avatar_state.pos_y,
             );
             //because avatar image center (ant not left top corner) represents character position
-            let render_coords = mint::Point2{
+            let render_coords = mint::Point2 {
                 x: avatar_x - self.avatar_img_struct.width / 2.0,
                 y: avatar_y - self.avatar_img_struct.height / 2.0,
             };
 
-            let to_draw = if self.avatar_state.direction_is_diagonal {
-                &self.avatar_img_struct.avatar
-            } else {
-                &self.avatar_img_struct.avatar_other_angle
-            };
+            let to_draw: &graphics::Image = &self
+                .avatar_img_struct
+                .avatar_images
+                .get(&self.avatar_state.direction)
+                .unwrap();
 
             graphics::draw(ctx, to_draw, (render_coords,))?;
         }
@@ -395,6 +424,7 @@ impl ggez::event::EventHandler for GameState {
             KeyCode::Space => {
                 self.avatar_state.pos_x = 15.0;
                 self.avatar_state.pos_y = 15.0;
+                self.avatar_state.direction = Direction::Down;
                 self.projection.camera_center_pos_x = 15.0;
                 self.projection.camera_center_pos_y = 15.0;
                 self.visited_tiles_map = HashMap::new();
