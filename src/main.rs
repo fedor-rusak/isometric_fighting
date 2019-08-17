@@ -14,6 +14,7 @@ macro_rules! vec_of_strings {
     ($($x:expr),*) => (vec![$($x.to_string()),*]);
 }
 
+#[derive(Debug, PartialEq, Eq, Hash)]
 enum Direction {
     Up,
     UpRight,
@@ -24,6 +25,7 @@ enum Direction {
     Left,
     LeftUp,
 }
+
 use Direction::*;
 
 struct AvatarState {
@@ -62,8 +64,7 @@ struct TileDimensions {
 struct AvatarImgStruct {
     width: f32,
     height: f32,
-    avatar: graphics::Image,
-    avatar_other_angle: graphics::Image,
+    avatar_images: HashMap<Direction, graphics::Image>,
 }
 
 struct FloorImgStruct {
@@ -101,8 +102,17 @@ impl GameState {
         let floor_tile = graphics::Image::new(ctx, "/tile.png")?;
         let floor_tile_colored = graphics::Image::new(ctx, "/tile_colored.png")?;
         let floor_tile_colored_pit = graphics::Image::new(ctx, "/tile_colored_pit.png")?;
-        let avatar_face = graphics::Image::new(ctx, "/avatar.png")?;
-        let avatar_face_other_angle = graphics::Image::new(ctx, "/avatar_other_angle.png")?;
+
+        let mut avatar_images: HashMap<Direction, graphics::Image> = HashMap::new();
+        avatar_images.insert(Down, graphics::Image::new(ctx, "/avatar_d.png")?);
+        avatar_images.insert(DownLeft, graphics::Image::new(ctx, "/avatar_dl.png")?);
+        avatar_images.insert(Left, graphics::Image::new(ctx, "/avatar_l.png")?);
+        avatar_images.insert(LeftUp, graphics::Image::new(ctx, "/avatar_lu.png")?);
+        avatar_images.insert(Up, graphics::Image::new(ctx, "/avatar_u.png")?);
+        avatar_images.insert(UpRight, graphics::Image::new(ctx, "/avatar_ur.png")?);
+        avatar_images.insert(Right, graphics::Image::new(ctx, "/avatar_r.png")?);
+        avatar_images.insert(RightDown, graphics::Image::new(ctx, "/avatar_rd.png")?);
+
         let mut grass_step = audio::Source::new(ctx, "/grass_foot_step.ogg")?;
         grass_step.set_volume(0.5);
         let mut river_and_birds = audio::Source::new(ctx, "/river_and_birds.ogg")?;
@@ -142,8 +152,7 @@ impl GameState {
             avatar_img_struct: AvatarImgStruct {
                 width: 100.0,
                 height: 100.0,
-                avatar: avatar_face,
-                avatar_other_angle: avatar_face_other_angle,
+                avatar_images,
             },
             sound: grass_step,
             background_audio: river_and_birds,
@@ -356,10 +365,11 @@ impl ggez::event::EventHandler for GameState {
                 y: avatar_y - self.avatar_img_struct.height / 2.0,
             };
 
-            let to_draw = match self.avatar_state.direction {
-                Left | Right | Up | Down => &self.avatar_img_struct.avatar_other_angle,
-                LeftUp | RightDown | UpRight | DownLeft => &self.avatar_img_struct.avatar,
-            };
+            let to_draw: &graphics::Image = &self
+                .avatar_img_struct
+                .avatar_images
+                .get(&self.avatar_state.direction)
+                .unwrap();
 
             graphics::draw(ctx, to_draw, (render_coords,))?;
         }

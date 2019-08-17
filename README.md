@@ -34,6 +34,9 @@ Esc to exit.
 
 ## History
 
+### 0.1.23
+ - New shiny 8-way avatar movement and rendering!
+
 ### 0.1.22
  - Flipped x-axis and y-axis
 

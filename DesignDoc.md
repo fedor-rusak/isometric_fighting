@@ -44,6 +44,8 @@ I still have some fun experience with this little project. And while I do some s
 
 We have a separate storage with coordinates of tiles we consider pits. And you as a player can't step in them. This is a beginning of a collision detection system.
 
+Want to work with models and renders? Blender >=2.8 and you Drawing editor of choice is enough.
+
 # Things to try
 
 Do some perspective rendering and image movement. Done!
@@ -70,9 +72,9 @@ So last addition was rather huge so let me explain the idea. I wanted to move cu
 
 There is some 3d world, but when rendering a 2d image of it (to show it on screen you know?) we have to transform 3d coords to some 2d coords. This is called projection. And this projection must be done for some theoretical viewer that is almost like camera man. Henth camera approach. In current state camera shows the center part of grid 20x20 which is playground for cube avatar.
 
-Technical details are like this. I have to introduced normal 3d coords (z is always 0 now), and movement have to be described as moving in this 3d coords and not some screen coords dependant on screen size. This is somewhat difficult to describe easier yet this is really improtant to show many objects and introduce things like physics and collision and predictable movement.
+Technical details are like this. I have to introduced normal 3d coords (z is always 0 now), and movement have to be described as moving in this 3d coords and not some screen coords dependant on screen size. This is somewhat difficult to describe easier yet this is really important to show many objects and introduce things like physics and collision and predictable movement.
 
-Movement had to be redone as previously it was working with axis, and now this is converted to inputs which are later converted to specific combinations of axis values and special modifier for diagonal movement. Because moving left and right at the sametime should have same length as left OR right. So 1 step for straight movement is like sin45 for two axis which is like 0.85. Sounds clunky but believe me it should be like that.
+Movement in diagonal means usage of sin45 as coefficient to typical speed. This allows sane movement in 3d and all directions.
 
 So now if I would want to do something like zooming it would mean changes in some places but it would be in update and render and not in input handling part.
 
