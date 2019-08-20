@@ -34,6 +34,9 @@ Esc to exit.
 
 ## History
 
+### 0.1.25
+ - Position rendered as text!
+
 ### 0.1.24
  - Bugfix for default direction
 

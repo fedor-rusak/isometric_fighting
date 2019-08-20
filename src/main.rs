@@ -1,13 +1,13 @@
 extern crate ggez;
 
 use std::collections::HashMap;
-use std::env;
-use std::path;
 use std::time::Duration;
+use std::{env, path};
 
 use ggez::audio::SoundSource;
 use ggez::error::GameResult;
 use ggez::event::{KeyCode, KeyMods};
+use ggez::graphics::Text;
 use ggez::{audio, conf, event, graphics, mint, timer, Context, ContextBuilder};
 
 macro_rules! vec_of_strings {
@@ -376,6 +376,16 @@ impl ggez::event::EventHandler for GameState {
 
             graphics::draw(ctx, to_draw, (render_coords,))?;
         }
+
+        let pos_text = format!(
+            "X: {:>5.1}, Y {:>5.1}",
+            self.avatar_state.pos_x, self.avatar_state.pos_y
+        );
+        graphics::draw(
+            ctx,
+            &Text::new(pos_text),
+            (mint::Point2 { x: 5.0, y: 5.0 }, graphics::WHITE),
+        )?;
 
         graphics::present(ctx)?;
         Ok(())
