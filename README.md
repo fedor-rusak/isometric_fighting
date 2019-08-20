@@ -34,6 +34,9 @@ Esc to exit.
 
 ## History
 
+### 0.1.24
+ - Bugfix for default direction
+
 ### 0.1.23
  - New shiny 8-way avatar movement and rendering!
 

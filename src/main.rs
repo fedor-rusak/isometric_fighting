@@ -14,7 +14,7 @@ macro_rules! vec_of_strings {
     ($($x:expr),*) => (vec![$($x.to_string()),*]);
 }
 
-#[derive(Debug, PartialEq, Eq, Hash)]
+#[derive(Debug, PartialEq, Eq, Hash, Clone, Copy)]
 enum Direction {
     Up,
     UpRight,
@@ -203,11 +203,15 @@ fn project(
 /// Diagonal movement for step of 1.0 means sin45*1.0 = 0.85
 fn handle_movement_input(
     input_state: &InputState,
-    old_x: f32,
-    old_y: f32,
+    avatar_state: &AvatarState,
     pits: &[String],
     tile_dimensions: &TileDimensions,
 ) -> (f32, f32, Direction) {
+    let &AvatarState {
+        pos_x: old_x,
+        pos_y: old_y,
+        direction: old_direction,
+    } = avatar_state;
     let &InputState {
         up,
         right,
@@ -225,7 +229,7 @@ fn handle_movement_input(
         (false, false, true, true) => (0.0, -1.0, DownLeft),
         (false, false, false, true) => (0.85, -0.85, Left),
         (true, false, false, true) => (1.0, 0.0, LeftUp),
-        _ => (0.0, 0.0, Down),
+        _ => (0.0, 0.0, old_direction),
     };
 
     let result_x = old_x + xaxis * speed;
@@ -273,8 +277,7 @@ impl ggez::event::EventHandler for GameState {
         //movement
         let (new_x, new_y, direction) = handle_movement_input(
             &self.input,
-            self.avatar_state.pos_x,
-            self.avatar_state.pos_y,
+            &self.avatar_state,
             &self.pits,
             &self.tile_dimensions,
         );
