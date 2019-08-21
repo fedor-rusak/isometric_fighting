@@ -11,6 +11,8 @@ use ggez::event::{KeyCode, KeyMods};
 use ggez::graphics::Text;
 use ggez::{audio, event, graphics, mint, timer, Context, ContextBuilder};
 
+use rand;
+
 macro_rules! vec_of_strings {
     ($($x:expr),*) => (vec![$($x.to_string()),*]);
 }
@@ -96,6 +98,8 @@ struct GameState {
     sound: audio::Source,
     background_audio: audio::Source,
     pits: Vec<String>,
+    artificial_input: InputState,
+    frame_counter: i32,
 }
 
 impl GameState {
@@ -158,6 +162,8 @@ impl GameState {
             sound: grass_step,
             background_audio: river_and_birds,
             pits,
+            artificial_input: InputState::default(),
+            frame_counter: 0,
         };
 
         Ok(state)
@@ -275,9 +281,28 @@ impl ggez::event::EventHandler for GameState {
     fn update(&mut self, ctx: &mut Context) -> GameResult {
         let mut timeframe = Duration::new(0, 0);
 
+        //artificial input
+        if rand::random() && self.frame_counter % 30 == 0 {
+            self.artificial_input = InputState {
+                up: rand::random(),
+                right: rand::random(),
+                down: rand::random(),
+                left: rand::random(),
+                speed: 1.5,
+            };
+
+            if self.artificial_input.up && self.artificial_input.down {
+                self.artificial_input.down = false;
+            }
+
+            if self.artificial_input.left && self.artificial_input.right {
+                self.artificial_input.left = false;
+            }
+        }
+
         //movement
         let (new_x, new_y, direction) = handle_movement_input(
-            &self.input,
+            &self.artificial_input,
             &self.avatar_state,
             &self.pits,
             &self.tile_dimensions,
@@ -291,7 +316,7 @@ impl ggez::event::EventHandler for GameState {
         self.projection.camera_center_pos_y = new_y;
 
         //sound
-        if is_moving(&self.input) && !self.sound.playing() {
+        if is_moving(&self.artificial_input) && !self.sound.playing() {
             let _result = self.sound.play();
         }
 
@@ -313,6 +338,7 @@ impl ggez::event::EventHandler for GameState {
         }
 
         self.time_passed_from_last_frame = timeframe;
+        self.frame_counter = (self.frame_counter + 1) % i32::max_value();
 
         Ok(())
     }

@@ -1,12 +1,13 @@
 [package]
 name = "isometric_fighting"
-version = "0.1.26"
+version = "0.1.27"
 authors = ["Fedor Rusak <node@fedor-rusak.ru>"]
 edition = "2018"
 license = "MIT"
 
 [dependencies]
 ggez = "0.5.1"
+rand = "0.7"
 
 [profile.dev]
 opt-level=2

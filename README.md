@@ -34,6 +34,9 @@ Esc to exit.
 
 ## History
 
+### 0.1.27
+ - Rise of the artificial... INPUT
+
 ### 0.1.26
  - Improved window configuration (title, size)
 
