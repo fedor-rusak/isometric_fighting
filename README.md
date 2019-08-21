@@ -34,6 +34,9 @@ Esc to exit.
 
 ## History
 
+### 0.1.26
+ - Improved window configuration (title, size)
+
 ### 0.1.25
  - Position rendered as text!
 

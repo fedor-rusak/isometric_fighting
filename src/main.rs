@@ -5,10 +5,11 @@ use std::time::Duration;
 use std::{env, path};
 
 use ggez::audio::SoundSource;
+use ggez::conf::{WindowMode, WindowSetup};
 use ggez::error::GameResult;
 use ggez::event::{KeyCode, KeyMods};
 use ggez::graphics::Text;
-use ggez::{audio, conf, event, graphics, mint, timer, Context, ContextBuilder};
+use ggez::{audio, event, graphics, mint, timer, Context, ContextBuilder};
 
 macro_rules! vec_of_strings {
     ($($x:expr),*) => (vec![$($x.to_string()),*]);
@@ -456,11 +457,14 @@ fn main() {
         path::PathBuf::from("./resources")
     };
 
-    let config = conf::Conf::new();
-
     let (ref mut ctx, ref mut event_loop) = ContextBuilder::new("hello_ggez", "isometric_fighting")
         .add_resource_path(resource_dir)
-        .conf(config)
+        .window_setup(WindowSetup::default().title("Isometric fighting! (The beginning)"))
+        .window_mode(
+            WindowMode::default()
+                .dimensions(800.0, 600.0)
+                .resizable(false),
+        )
         .build()
         .unwrap();
 
