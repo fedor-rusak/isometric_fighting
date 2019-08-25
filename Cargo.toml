@@ -1,12 +1,12 @@
 [package]
 name = "isometric_fighting"
-version = "0.1.27"
+version = "0.1.28"
 authors = ["Fedor Rusak <node@fedor-rusak.ru>"]
 edition = "2018"
 license = "MIT"
 
 [dependencies]
-ggez = "0.5.1"
+ggez = { git = "https://github.com/fedor-rusak/ggez", rev = "4fdde1c" }
 rand = "0.7"
 
 [profile.dev]

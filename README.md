@@ -34,6 +34,9 @@ Esc to exit.
 
 ## History
 
+### 0.1.28
+ - ggez from my fork
+
 ### 0.1.27
  - Rise of the artificial... INPUT
 

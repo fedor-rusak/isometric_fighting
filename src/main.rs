@@ -8,7 +8,6 @@ use ggez::audio::SoundSource;
 use ggez::conf::{WindowMode, WindowSetup};
 use ggez::error::GameResult;
 use ggez::event::{KeyCode, KeyMods};
-use ggez::graphics::Text;
 use ggez::{audio, event, graphics, mint, timer, Context, ContextBuilder};
 
 use rand;
@@ -404,15 +403,11 @@ impl ggez::event::EventHandler for GameState {
             graphics::draw(ctx, to_draw, (render_coords,))?;
         }
 
-        let pos_text = format!(
-            "X: {:>5.1}, Y {:>5.1}",
-            self.avatar_state.pos_x, self.avatar_state.pos_y
-        );
-        graphics::draw(
-            ctx,
-            &Text::new(pos_text),
-            (mint::Point2 { x: 5.0, y: 5.0 }, graphics::WHITE),
-        )?;
+        // let pos_text = format!(
+        //     "X: {:>5.1}, Y {:>5.1}",
+        //     self.avatar_state.pos_x, self.avatar_state.pos_y
+        // );
+        // println!("{}", pos_text);
 
         graphics::present(ctx)?;
         Ok(())
